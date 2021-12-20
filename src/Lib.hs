@@ -6,13 +6,15 @@ import Debug.Trace
 import Control.Arrow (Arrow(first))
 
 
-data Operation = Add | Sub deriving (Show)
+data Operation = Add | Sub | Multi | Div deriving (Show)
 
 getOperation :: String -> Operation
 getOperation "+" = Add
 getOperation "-" = Sub
+getOperation "*" = Multi
+getOperation "/" = Div
 getOperation inp =
-    let operationString =  [ x | x <- inp, x == '+' || x == '-']
+    let operationString =  [ x | x <- inp, x == '+' || x == '-' || x == '*' || x == '/']
     in getOperation operationString
 
 splitWhen :: (Char -> Bool) -> String -> [String]
@@ -22,8 +24,10 @@ splitWhen p s = case dropWhile p s of
           where (w, s'') = break p s'
 
 operationToString :: Operation -> (Char -> Bool)
-operationToString Add = (=='+')
-operationToString Sub = (=='-')
+operationToString Add   = (=='+')
+operationToString Sub   = (=='-')
+operationToString Multi = (=='*')
+operationToString Div   = (=='/')
 
 performOperation :: Operation -> [String ] -> Float
 performOperation op inp =
@@ -32,8 +36,10 @@ performOperation op inp =
         firstNum    = read firstString :: Float
         lastNum     = read lastString  :: Float
     in case op of
-            Add -> firstNum + lastNum
-            Sub -> firstNum - lastNum
+            Add   -> firstNum + lastNum
+            Sub   -> firstNum - lastNum
+            Multi -> firstNum * lastNum
+            Div   -> firstNum / lastNum
 
 calculate :: String -> Float
 calculate line =
